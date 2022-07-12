@@ -1,25 +1,50 @@
-import logo from './logo.svg';
 import './App.css';
+import Form from './components/Form';
+import Dashboard from './components/Dashboard';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import SuccessPage from './components/SuccessPage';
+import Login from './components/Login';
+import { useEffect } from 'react';
+import { auth } from './firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { login, selectUser } from './features/authSlice';
+
 
 function App() {
+  const dispatch = useDispatch()
+  const user = useSelector(selectUser)
+
+  useEffect(() => {
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        dispatch(login(authUser))
+      }
+    })
+  }, [])
+
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+
+    <div className="app">
+      <Routes>
+        <Route exact path="/" element={<Form />} />
+        <Route path="/dashboard" element={user !== null ? <Dashboard /> : <Login />} />
+
+
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/success/:handle" element={<SuccessPage />} />
+
+
+
+      </Routes>
+
     </div>
-  );
+
+  )
+
 }
 
 export default App;
